@@ -30,6 +30,7 @@ impl FseventsTracker {
         Ok(())
     }
 
+    #[allow(dead_code)]
     fn start_fsevent_stream(&self) -> Result<()> {
         let mut running = self.running.lock().map_err(|e| anyhow::anyhow!("Lock error: {}", e))?;
         if *running {
