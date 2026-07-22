@@ -4,7 +4,6 @@ b = "build"
 r = "run"
 c = "check"
 l = "clippy"
-fmt = "fmt"
 bench = "bench"
 doc = "doc --no-deps"
 
