@@ -1,3 +1,5 @@
+<img width="1408" height="768" alt="Gemini_Generated_Image_p3vi8fp3vi8fp3vi" src="https://github.com/user-attachments/assets/e7295289-da93-4905-b361-b223f6f9cfae" />
+
 # HELIX — Block-Level Backup Engine
 
 > **Problem:** Traditional backup tools (rsync, tar, Time Machine) operate at the file level. They depend on filesystem metadata, slow down on millions of small files, and waste space storing unchanged data blocks. On raw block devices or exotic filesystems, they simply don't work.
