@@ -1,0 +1,53 @@
+# HELIX Default Configuration
+# This file is embedded in the binary and used when no config file is found.
+
+block_size: 4096
+compression_level: 3
+
+encryption:
+  enabled: false
+  cipher: aes-256-gcm
+  key_path: null
+  kms_provider: null
+
+storage:
+  repository_path: /var/helix/backups
+  temp_path: null
+  max_parallel_io: 4
+  compression:
+    enabled: false
+    level: 3
+    algorithm: zstd
+
+backup:
+  exclude_paths: []
+  include_paths: []
+  retention_days: 30
+  schedule:
+    enabled: false
+    interval: daily
+    time: "02:00"
+  pre_backup_hook: null
+  post_backup_hook: null
+  verify_after_backup: true
+
+performance:
+  buffer_size_mb: 64
+  direct_io: true
+  throttle_mbps: null
+  thread_count: 4
+
+tracking:
+  method: auto
+  checkpoint_interval_secs: 300
+  persist_path: null
+
+restore:
+  verify_blocks: true
+  overwrite: false
+  dry_run: false
+
+logging:
+  level: info
+  file: null
+  format: text

@@ -1,0 +1,23 @@
+# Development container with full toolchain
+FROM rust:1.76-slim-bookworm
+
+RUN apt-get update && apt-get install -y \
+    pkg-config \
+    libsqlite3-dev \
+    libssl-dev \
+    build-essential \
+    gdb \
+    strace \
+    lsof \
+    curl \
+    vim \
+    git \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN rustup component add rustfmt clippy
+
+RUN mkdir -p /var/helix/backups /etc/helix
+
+WORKDIR /app
+
+CMD ["/bin/bash"]

@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  helix:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: helix-backup:latest
+    container_name: helix
+    privileged: true
+    volumes:
+      - backups:/var/helix/backups
+      - ./config:/etc/helix:ro
+      - data:/data:ro
+    environment:
+      - HELIX_CONFIG=/etc/helix/config.yaml
+      - RUST_LOG=info
+    command: ["--help"]
+    restart: unless-stopped
+
+  helix-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    image: helix-backup:dev
+    container_name: helix-dev
+    privileged: true
+    volumes:
+      - .:/app
+      - backups-dev:/var/helix/backups
+      - data:/data:ro
+    environment:
+      - HELIX_CONFIG=/etc/helix/config.yaml
+      - RUST_LOG=debug
+      - CARGO_HOME=/app/.cargo
+    working_dir: /app
+    stdin_open: true
+    tty: true
+    command: ["/bin/bash"]
+
+volumes:
+  backups:
+  backups-dev:
+  data:

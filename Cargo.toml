@@ -1,0 +1,93 @@
+[package]
+name = "helix"
+version = "1.0.0"
+edition = "2021"
+description = "Enterprise-Grade Block-Level Backup Engine"
+authors = ["Helix Team"]
+license = "MIT"
+repository = "https://github.com/helix/helix"
+homepage = "https://helix-backup.io"
+keywords = ["backup", "block-level", "disaster-recovery", "cross-platform"]
+categories = ["command-line-utilities", "filesystem"]
+
+[package.metadata]
+maintainer = "Helix Team"
+
+[dependencies]
+# CLI
+clap = { version = "4.5", features = ["derive", "color"] }
+colored = "2.1"
+
+# Async runtime
+tokio = { version = "1.38", features = ["full", "tracing"] }
+futures = "0.3"
+
+# Error handling
+anyhow = "1.0"
+thiserror = "1.0"
+
+# Serialization
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+serde_yaml = "0.9"
+
+# Database
+rusqlite = { version = "0.31", features = ["bundled"] }
+
+# Hashing & Crypto
+blake3 = "=1.5.4"
+aes-gcm = { version = "0.10", optional = true }
+zstd = { version = "0.13", optional = true }
+
+# System interaction
+nix = "0.28"
+libc = "0.2"
+
+# Filesystem
+walkdir = "2.5"
+tempfile = "3.10"
+
+# Logging
+env_logger = "0.11"
+log = "0.4"
+
+# Utilities
+glob = "0.3"
+chrono = { version = "0.4", features = ["serde"] }
+uuid = { version = "1.8", features = ["v4", "serde"] }
+notify = "6.1"
+indicatif = { version = "0.17", optional = true }
+rayon = "1.10"
+
+rand = "0.8"
+
+# OS-specific
+cfg-if = "1.0"
+
+
+
+[target.'cfg(target_os="macos")'.dependencies]
+core-foundation = "0.9"
+core-foundation-sys = "0.8"
+
+[dev-dependencies]
+rstest = "0.18"
+tempfile = "3.10"
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
+strip = true
+debug = false
+
+[profile.dev]
+opt-level = 0
+debug = true
+
+[features]
+default = ["full"]
+full = ["encryption", "compression", "progress"]
+encryption = ["aes-gcm"]
+compression = ["zstd"]
+progress = ["dep:indicatif"]

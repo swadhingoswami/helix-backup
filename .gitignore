@@ -1,0 +1,35 @@
+# Rust
+target/
+Cargo.lock
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment
+.env
+.env.*
+
+# Logs
+*.log
+/logs/
+
+# Generated files
+backups/
+*.tar.gz
+*.tgz
+
+# Config with secrets
+config/*.local.yaml
+config/*.local.yml
+
+# Editor files
+*.iml
+.vscode/settings.json

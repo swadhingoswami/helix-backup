@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: HELIX Documentation
+    url: https://github.com/helix/helix/tree/main/docs
+    about: Please check the documentation before opening an issue.
+  - name: Security Issues
+    url: https://github.com/helix/helix/security/policy
+    about: Please report security vulnerabilities privately.

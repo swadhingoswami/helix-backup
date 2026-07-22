@@ -1,0 +1,114 @@
+# =============================================================================
+# HELIX Advanced Configuration Example
+# =============================================================================
+# This configuration demonstrates production-ready settings for an
+# enterprise backup deployment with encryption, compression, and monitoring.
+
+# Block size (4 KB is optimal for general workloads)
+block_size: 4096
+
+# ZSTD compression level (3 = balanced speed/ratio)
+compression_level: 3
+
+# =============================================================================
+# Encryption
+# =============================================================================
+encryption:
+  enabled: true
+  key_path: /etc/helix/backup.key
+  cipher: aes-256-gcm
+
+  # KMS integration (optional)
+  # kms_provider: aws-kms
+  # kms_key_id: arn:aws:kms:us-east-1:123456789012:key/abc123
+
+# =============================================================================
+# Storage
+# =============================================================================
+storage:
+  repository_path: /mnt/backup-nas/helix-backups
+  temp_path: /var/helix/tmp
+  max_parallel_io: 8
+
+  compression:
+    enabled: true
+    level: 3
+    algorithm: zstd
+
+# =============================================================================
+# Backup Configuration
+# =============================================================================
+backup:
+  # Retention: keep daily for 7 days, weekly for 4 weeks, monthly for 12 months
+  retention_days: 365
+
+  # Exclude specific filesystem paths from tracking
+  exclude_paths:
+    - /tmp
+    - /var/cache
+    - /var/tmp
+    - /proc
+    - /sys
+
+  # Scheduled backup (for use with systemd timer)
+  schedule:
+    enabled: true
+    interval: daily
+    time: "02:00"
+
+  # Pre/post backup hooks for integration with monitoring
+  pre_backup_hook: /etc/helix/hooks/pre-backup.sh
+  post_backup_hook: /etc/helix/hooks/post-backup.sh
+
+  # Verify data integrity after backup
+  verify_after_backup: true
+
+# =============================================================================
+# Performance
+# =============================================================================
+performance:
+  # Larger buffer improves throughput on fast storage
+  buffer_size_mb: 256
+
+  # Direct I/O bypasses OS cache (Linux only)
+  direct_io: true
+
+  # Throttle to 200 MB/s to avoid saturating storage
+  throttle_mbps: 200
+
+  # Use available CPU cores
+  thread_count: 16
+
+# =============================================================================
+# Change Tracking
+# =============================================================================
+tracking:
+  # Auto-detect best method for platform
+  method: auto
+
+  # Checkpoint every 5 minutes
+  checkpoint_interval_secs: 300
+
+  # Persist tracking state for crash recovery
+  persist_path: /var/helix/tracking
+
+# =============================================================================
+# Restore
+# =============================================================================
+restore:
+  # Verify all blocks during restore
+  verify_blocks: true
+
+  # Never overwrite without confirmation
+  overwrite: false
+
+  # Dry run by default (remove for actual restore)
+  dry_run: false
+
+# =============================================================================
+# Logging
+# =============================================================================
+logging:
+  level: info
+  file: /var/log/helix/helix.log
+  format: json
