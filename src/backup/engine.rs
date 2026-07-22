@@ -7,6 +7,7 @@ use crate::repository::layout::Repository;
 
 pub struct BackupEngine {
     block_size: u32,
+    #[allow(dead_code)]
     hasher: BlockHasher,
 }
 
@@ -100,7 +101,7 @@ impl BackupEngine {
                     Ok(data) => {
                         let hash = *blake3::hash(&data).as_bytes();
                         let stored = manifest_hashes.get(&block_num);
-                        if stored.map_or(true, |s| *s != hash) {
+                        if stored.is_none_or(|s| *s != hash) {
                             Some(Ok(block_num))
                         } else {
                             None

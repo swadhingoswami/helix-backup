@@ -34,7 +34,7 @@ pub fn parse_block_size(size_str: &str) -> Result<u32> {
         anyhow::bail!("Block size must be a power of two (e.g., 512, 4096, 8192)");
     }
 
-    if size < 512 || size > 1_048_576 {
+    if !(512..=1_048_576).contains(&size) {
         anyhow::bail!("Block size must be between 512 bytes and 1 MiB");
     }
 

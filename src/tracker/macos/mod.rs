@@ -7,6 +7,7 @@ use super::{ChangeTracker, Checkpoint};
 pub struct FseventsTracker {
     watched_paths: Mutex<Vec<String>>,
     changed_paths: Mutex<BTreeSet<String>>,
+    #[allow(dead_code)]
     running: Mutex<bool>,
 }
 

@@ -28,7 +28,7 @@ impl FileBlockMapper {
     }
 
     pub fn blocks_for_size(&self, size: u64) -> u64 {
-        (size + self.block_size as u64 - 1) / self.block_size as u64
+        size.div_ceil(self.block_size as u64)
     }
 
     pub fn set_file_size(&mut self, size: u64) {
@@ -37,6 +37,7 @@ impl FileBlockMapper {
 }
 
 pub struct ChangeMap {
+    #[allow(dead_code)]
     block_size: u32,
     changed_blocks: BTreeMap<u64, Vec<u8>>,
 }

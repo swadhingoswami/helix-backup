@@ -9,6 +9,12 @@ pub struct BlockHash {
 
 pub struct BlockHasher;
 
+impl Default for BlockHasher {
+    fn default() -> Self {
+        Self
+    }
+}
+
 impl BlockHasher {
     pub fn new() -> Self {
         Self

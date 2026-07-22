@@ -92,8 +92,7 @@ mod tests {
 
     #[test]
     fn test_invalid_block_size() {
-        let mut config = Config::default();
-        config.block_size = 1234;
+        let config = Config { block_size: 1234, ..Config::default() };
         assert!(validate(&config).is_err());
     }
 

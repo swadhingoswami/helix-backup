@@ -27,7 +27,7 @@ pub fn load_config(path: Option<&str>) -> Result<Config> {
 fn config_file_paths() -> Vec<PathBuf> {
     let mut paths = Vec::new();
 
-    if let Some(cwd) = std::env::current_dir().ok() {
+    if let Ok(cwd) = std::env::current_dir() {
         for name in &["helix.yaml", "helix.yml", "config.yaml", "helix.config.yaml"] {
             paths.push(cwd.join(name));
         }

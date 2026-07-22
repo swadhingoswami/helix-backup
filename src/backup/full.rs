@@ -7,6 +7,7 @@ use crate::block::hasher::BlockHasher;
 use crate::repository::layout::Repository;
 
 pub struct FullBackup {
+    #[allow(dead_code)]
     block_size: u32,
     hasher: BlockHasher,
 }

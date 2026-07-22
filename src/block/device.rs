@@ -38,6 +38,7 @@ impl BlockDevice {
             .read(true)
             .write(true)
             .create(true)
+            .truncate(false)
             .open(path)
             .with_context(|| format!("Cannot open target device for writing: {}", path))?;
 

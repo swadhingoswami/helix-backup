@@ -6,6 +6,7 @@ use crate::block::hasher::BlockHasher;
 use crate::repository::layout::Repository;
 
 pub struct IncrementalBackup {
+    #[allow(dead_code)]
     block_size: u32,
     hasher: BlockHasher,
 }

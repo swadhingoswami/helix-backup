@@ -5,6 +5,7 @@ use std::sync::Mutex;
 use super::{ChangeTracker, Checkpoint};
 
 pub struct BitmapTracker {
+    #[allow(dead_code)]
     block_size: u32,
     dirty_blocks: Mutex<BTreeSet<u64>>,
     total_blocks: Mutex<u64>,

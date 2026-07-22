@@ -5,6 +5,7 @@ use std::path::Path;
 use super::{ChangeTracker, Checkpoint};
 
 pub struct DmEraTracker {
+    #[allow(dead_code)]
     device_path: String,
 }
 
