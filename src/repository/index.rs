@@ -21,7 +21,10 @@ impl IndexManager {
     }
 
     fn initialize(&self) -> Result<()> {
-        let conn = self.conn.lock().map_err(|e| anyhow::anyhow!("Lock error: {}", e))?;
+        let conn = self
+            .conn
+            .lock()
+            .map_err(|e| anyhow::anyhow!("Lock error: {}", e))?;
         conn.execute_batch(
             "CREATE TABLE IF NOT EXISTS snapshots (
                 id TEXT PRIMARY KEY,
@@ -62,7 +65,10 @@ impl IndexManager {
     }
 
     pub fn record_snapshot(&self, snapshot: &BackupSnapshot) -> Result<()> {
-        let conn = self.conn.lock().map_err(|e| anyhow::anyhow!("Lock error: {}", e))?;
+        let conn = self
+            .conn
+            .lock()
+            .map_err(|e| anyhow::anyhow!("Lock error: {}", e))?;
         conn.execute(
             "INSERT OR REPLACE INTO snapshots (id, timestamp, backup_type, block_count, total_size, label, parent_id)
              VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7)",
@@ -80,7 +86,10 @@ impl IndexManager {
     }
 
     pub fn get_snapshots(&self) -> Result<Vec<BackupSnapshot>> {
-        let conn = self.conn.lock().map_err(|e| anyhow::anyhow!("Lock error: {}", e))?;
+        let conn = self
+            .conn
+            .lock()
+            .map_err(|e| anyhow::anyhow!("Lock error: {}", e))?;
         let mut stmt = conn.prepare(
             "SELECT id, timestamp, backup_type, block_count, total_size, label, parent_id
              FROM snapshots ORDER BY timestamp ASC",
@@ -105,17 +114,28 @@ impl IndexManager {
     }
 
     pub fn save_checkpoint(&self, checkpoint: &Checkpoint) -> Result<()> {
-        let conn = self.conn.lock().map_err(|e| anyhow::anyhow!("Lock error: {}", e))?;
+        let conn = self
+            .conn
+            .lock()
+            .map_err(|e| anyhow::anyhow!("Lock error: {}", e))?;
         conn.execute(
             "INSERT OR REPLACE INTO checkpoints (id, timestamp, block_count, tracking_method)
              VALUES (?1, ?2, ?3, ?4)",
-            params![checkpoint.id, checkpoint.timestamp, checkpoint.block_count, checkpoint.tracking_method],
+            params![
+                checkpoint.id,
+                checkpoint.timestamp,
+                checkpoint.block_count,
+                checkpoint.tracking_method
+            ],
         )?;
         Ok(())
     }
 
     pub fn get_last_checkpoint(&self) -> Result<Option<Checkpoint>> {
-        let conn = self.conn.lock().map_err(|e| anyhow::anyhow!("Lock error: {}", e))?;
+        let conn = self
+            .conn
+            .lock()
+            .map_err(|e| anyhow::anyhow!("Lock error: {}", e))?;
         let mut stmt = conn.prepare(
             "SELECT id, timestamp, block_count, tracking_method
              FROM checkpoints ORDER BY timestamp DESC LIMIT 1",
@@ -137,8 +157,18 @@ impl IndexManager {
         }
     }
 
-    pub fn record_block(&self, block_number: u64, snapshot_id: &str, offset: u64, size: u32, hash: &str) -> Result<()> {
-        let conn = self.conn.lock().map_err(|e| anyhow::anyhow!("Lock error: {}", e))?;
+    pub fn record_block(
+        &self,
+        block_number: u64,
+        snapshot_id: &str,
+        offset: u64,
+        size: u32,
+        hash: &str,
+    ) -> Result<()> {
+        let conn = self
+            .conn
+            .lock()
+            .map_err(|e| anyhow::anyhow!("Lock error: {}", e))?;
         conn.execute(
             "INSERT OR REPLACE INTO block_index (block_number, snapshot_id, offset, size, hash)
              VALUES (?1, ?2, ?3, ?4, ?5)",
@@ -147,8 +177,14 @@ impl IndexManager {
         Ok(())
     }
 
-    pub fn get_blocks_for_snapshot(&self, snapshot_id: &str) -> Result<Vec<(u64, u64, u32, String)>> {
-        let conn = self.conn.lock().map_err(|e| anyhow::anyhow!("Lock error: {}", e))?;
+    pub fn get_blocks_for_snapshot(
+        &self,
+        snapshot_id: &str,
+    ) -> Result<Vec<(u64, u64, u32, String)>> {
+        let conn = self
+            .conn
+            .lock()
+            .map_err(|e| anyhow::anyhow!("Lock error: {}", e))?;
         let mut stmt = conn.prepare(
             "SELECT block_number, offset, size, hash
              FROM block_index WHERE snapshot_id = ?1 ORDER BY block_number",
@@ -170,13 +206,13 @@ impl IndexManager {
     }
 
     pub fn get_statistics(&self) -> Result<IndexStatistics> {
-        let conn = self.conn.lock().map_err(|e| anyhow::anyhow!("Lock error: {}", e))?;
+        let conn = self
+            .conn
+            .lock()
+            .map_err(|e| anyhow::anyhow!("Lock error: {}", e))?;
 
-        let total_snapshots: u64 = conn.query_row(
-            "SELECT COUNT(*) FROM snapshots",
-            [],
-            |row| row.get(0),
-        )?;
+        let total_snapshots: u64 =
+            conn.query_row("SELECT COUNT(*) FROM snapshots", [], |row| row.get(0))?;
 
         let total_blocks: u64 = conn.query_row(
             "SELECT COALESCE(SUM(block_count), 0) FROM snapshots",

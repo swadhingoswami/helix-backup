@@ -10,7 +10,10 @@ async fn main() -> Result<()> {
         .init();
 
     let cli = Cli::parse();
-    info!("Helix block-level backup engine v{}", env!("CARGO_PKG_VERSION"));
+    info!(
+        "Helix block-level backup engine v{}",
+        env!("CARGO_PKG_VERSION")
+    );
 
     match cli.command {
         Some(cmd) => helix::cli::commands::dispatch(cmd).await?,

@@ -93,7 +93,11 @@ impl Repository {
     }
 
     pub fn create_snapshot(&self, label: &str, backup_type: &str) -> Result<String> {
-        let id = format!("{}-{}", backup_type, uuid::Uuid::new_v4().to_string().split('-').next().unwrap());
+        let id = format!(
+            "{}-{}",
+            backup_type,
+            uuid::Uuid::new_v4().to_string().split('-').next().unwrap()
+        );
 
         let snapshot_dir = if backup_type == "full" {
             self.root.join("Full").join(&id)
@@ -104,7 +108,11 @@ impl Repository {
         fs2::ensure_dir_exists(&snapshot_dir)?;
 
         let parent_id = if backup_type == "incremental" {
-            self.list_backups()?.into_iter().rev().find(|b| b.backup_type == "full").map(|b| b.id)
+            self.list_backups()?
+                .into_iter()
+                .rev()
+                .find(|b| b.backup_type == "full")
+                .map(|b| b.id)
         } else {
             None
         };
@@ -174,12 +182,9 @@ impl Repository {
 
         let mut offset = 0;
         while offset + 12 <= buffer.len() {
-            let block_num = u64::from_le_bytes(
-                buffer[offset..offset + 8].try_into().unwrap(),
-            );
-            let data_size = u32::from_le_bytes(
-                buffer[offset + 8..offset + 12].try_into().unwrap(),
-            ) as usize;
+            let block_num = u64::from_le_bytes(buffer[offset..offset + 8].try_into().unwrap());
+            let data_size =
+                u32::from_le_bytes(buffer[offset + 8..offset + 12].try_into().unwrap()) as usize;
             offset += 12;
 
             if offset + data_size > buffer.len() {
@@ -194,7 +199,11 @@ impl Repository {
         Ok(map)
     }
 
-    pub fn store_block_hashes(&self, snapshot_id: &str, hashes: &[crate::block::hasher::BlockHash]) -> Result<()> {
+    pub fn store_block_hashes(
+        &self,
+        snapshot_id: &str,
+        hashes: &[crate::block::hasher::BlockHash],
+    ) -> Result<()> {
         let manifest_path = self.find_manifest_path(snapshot_id)?;
         let content = std::fs::read_to_string(&manifest_path)?;
         let mut manifest: Manifest = serde_json::from_str(&content)?;
@@ -312,9 +321,15 @@ impl Repository {
         let backups = self.list_backups()?;
         for backup in &backups {
             let manifest_path = if backup.backup_type == "full" {
-                self.root.join("Full").join(&backup.id).join("manifest.json")
+                self.root
+                    .join("Full")
+                    .join(&backup.id)
+                    .join("manifest.json")
             } else {
-                self.root.join("Incremental").join(&backup.id).join("manifest.json")
+                self.root
+                    .join("Incremental")
+                    .join(&backup.id)
+                    .join("manifest.json")
             };
 
             if !manifest_path.exists() {
@@ -347,8 +362,14 @@ impl Repository {
 
     fn find_manifest_path(&self, snapshot_id: &str) -> Result<PathBuf> {
         let candidates = [
-            self.root.join("Full").join(snapshot_id).join("manifest.json"),
-            self.root.join("Incremental").join(snapshot_id).join("manifest.json"),
+            self.root
+                .join("Full")
+                .join(snapshot_id)
+                .join("manifest.json"),
+            self.root
+                .join("Incremental")
+                .join(snapshot_id)
+                .join("manifest.json"),
         ];
 
         for path in &candidates {

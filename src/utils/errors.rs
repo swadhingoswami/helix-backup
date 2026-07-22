@@ -56,9 +56,7 @@ impl HelixError {
     pub fn is_critical(&self) -> bool {
         matches!(
             self,
-            HelixError::Encryption(_)
-                | HelixError::Database(_)
-                | HelixError::Repository(_)
+            HelixError::Encryption(_) | HelixError::Database(_) | HelixError::Repository(_)
         )
     }
 
@@ -82,5 +80,3 @@ impl HelixError {
         }
     }
 }
-
-

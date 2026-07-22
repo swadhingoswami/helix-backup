@@ -27,7 +27,10 @@ impl CheckpointStore {
     }
 
     fn initialize_schema(&self) -> Result<()> {
-        let conn = self.conn.lock().map_err(|e| anyhow::anyhow!("Lock error: {}", e))?;
+        let conn = self
+            .conn
+            .lock()
+            .map_err(|e| anyhow::anyhow!("Lock error: {}", e))?;
         conn.execute_batch(
             "CREATE TABLE IF NOT EXISTS checkpoints (
                 id TEXT PRIMARY KEY,
@@ -52,17 +55,28 @@ impl CheckpointStore {
     }
 
     pub fn save_checkpoint(&self, checkpoint: &Checkpoint) -> Result<()> {
-        let conn = self.conn.lock().map_err(|e| anyhow::anyhow!("Lock error: {}", e))?;
+        let conn = self
+            .conn
+            .lock()
+            .map_err(|e| anyhow::anyhow!("Lock error: {}", e))?;
         conn.execute(
             "INSERT OR REPLACE INTO checkpoints (id, timestamp, block_count, tracking_method)
              VALUES (?1, ?2, ?3, ?4)",
-            params![checkpoint.id, checkpoint.timestamp, checkpoint.block_count, checkpoint.tracking_method],
+            params![
+                checkpoint.id,
+                checkpoint.timestamp,
+                checkpoint.block_count,
+                checkpoint.tracking_method
+            ],
         )?;
         Ok(())
     }
 
     pub fn get_latest_checkpoint(&self) -> Result<Option<Checkpoint>> {
-        let conn = self.conn.lock().map_err(|e| anyhow::anyhow!("Lock error: {}", e))?;
+        let conn = self
+            .conn
+            .lock()
+            .map_err(|e| anyhow::anyhow!("Lock error: {}", e))?;
         let mut stmt = conn.prepare(
             "SELECT id, timestamp, block_count, tracking_method
              FROM checkpoints ORDER BY timestamp DESC LIMIT 1",
@@ -84,8 +98,16 @@ impl CheckpointStore {
         }
     }
 
-    pub fn record_dirty_block(&self, block_number: u64, checkpoint_id: &str, hash: &str) -> Result<()> {
-        let conn = self.conn.lock().map_err(|e| anyhow::anyhow!("Lock error: {}", e))?;
+    pub fn record_dirty_block(
+        &self,
+        block_number: u64,
+        checkpoint_id: &str,
+        hash: &str,
+    ) -> Result<()> {
+        let conn = self
+            .conn
+            .lock()
+            .map_err(|e| anyhow::anyhow!("Lock error: {}", e))?;
         conn.execute(
             "INSERT OR REPLACE INTO dirty_blocks (block_number, checkpoint_id, hash)
              VALUES (?1, ?2, ?3)",
@@ -95,7 +117,10 @@ impl CheckpointStore {
     }
 
     pub fn get_dirty_blocks(&self, checkpoint_id: &str) -> Result<Vec<u64>> {
-        let conn = self.conn.lock().map_err(|e| anyhow::anyhow!("Lock error: {}", e))?;
+        let conn = self
+            .conn
+            .lock()
+            .map_err(|e| anyhow::anyhow!("Lock error: {}", e))?;
         let mut stmt = conn.prepare(
             "SELECT block_number FROM dirty_blocks WHERE checkpoint_id = ?1 ORDER BY block_number",
         )?;
@@ -109,7 +134,10 @@ impl CheckpointStore {
     }
 
     pub fn get_all_checkpoints(&self) -> Result<Vec<Checkpoint>> {
-        let conn = self.conn.lock().map_err(|e| anyhow::anyhow!("Lock error: {}", e))?;
+        let conn = self
+            .conn
+            .lock()
+            .map_err(|e| anyhow::anyhow!("Lock error: {}", e))?;
         let mut stmt = conn.prepare(
             "SELECT id, timestamp, block_count, tracking_method
              FROM checkpoints ORDER BY timestamp ASC",
@@ -131,7 +159,10 @@ impl CheckpointStore {
     }
 
     pub fn clear_checkpoints(&self) -> Result<()> {
-        let conn = self.conn.lock().map_err(|e| anyhow::anyhow!("Lock error: {}", e))?;
+        let conn = self
+            .conn
+            .lock()
+            .map_err(|e| anyhow::anyhow!("Lock error: {}", e))?;
         conn.execute_batch("DELETE FROM dirty_blocks; DELETE FROM checkpoints;")?;
         Ok(())
     }

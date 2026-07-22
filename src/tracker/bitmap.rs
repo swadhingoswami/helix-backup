@@ -45,7 +45,10 @@ impl BitmapTracker {
 
 impl ChangeTracker for BitmapTracker {
     fn get_changed_blocks(&self, _since: Option<Checkpoint>) -> Result<Vec<u64>> {
-        let blocks = self.dirty_blocks.lock().map_err(|e| anyhow::anyhow!("Lock error: {}", e))?;
+        let blocks = self
+            .dirty_blocks
+            .lock()
+            .map_err(|e| anyhow::anyhow!("Lock error: {}", e))?;
         let result: Vec<u64> = blocks.iter().copied().collect();
         Ok(result)
     }
@@ -55,7 +58,10 @@ impl ChangeTracker for BitmapTracker {
             id: uuid::Uuid::new_v4().to_string(),
             timestamp: chrono::Utc::now().timestamp(),
             block_count: {
-                let blocks = self.dirty_blocks.lock().map_err(|e| anyhow::anyhow!("Lock error: {}", e))?;
+                let blocks = self
+                    .dirty_blocks
+                    .lock()
+                    .map_err(|e| anyhow::anyhow!("Lock error: {}", e))?;
                 blocks.len() as u64
             },
             tracking_method: "bitmap".to_string(),
@@ -81,7 +87,10 @@ impl ChangeTracker for BitmapTracker {
     }
 
     fn get_current_checkpoint(&self) -> Result<Option<Checkpoint>> {
-        let cps = self.checkpoints.lock().map_err(|e| anyhow::anyhow!("Lock error: {}", e))?;
+        let cps = self
+            .checkpoints
+            .lock()
+            .map_err(|e| anyhow::anyhow!("Lock error: {}", e))?;
         Ok(cps.last().cloned())
     }
 }

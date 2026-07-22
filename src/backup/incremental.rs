@@ -50,7 +50,10 @@ impl IncrementalBackup {
         repo.store_block_hashes(snapshot_id, &all_hashes)?;
 
         repo.finalize_snapshot(snapshot_id)?;
-        log::info!("Incremental backup completed: {} blocks", changed_blocks.len());
+        log::info!(
+            "Incremental backup completed: {} blocks",
+            changed_blocks.len()
+        );
         Ok(())
     }
 }

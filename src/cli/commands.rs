@@ -10,10 +10,20 @@ pub struct Cli {
     #[command(subcommand)]
     pub command: Option<Commands>,
 
-    #[arg(global = true, short = 'v', long = "verbose", help = "Increase verbosity")]
+    #[arg(
+        global = true,
+        short = 'v',
+        long = "verbose",
+        help = "Increase verbosity"
+    )]
     pub verbose: bool,
 
-    #[arg(global = true, short = 'c', long = "config", help = "Path to configuration file")]
+    #[arg(
+        global = true,
+        short = 'c',
+        long = "config",
+        help = "Path to configuration file"
+    )]
     pub config: Option<String>,
 }
 
@@ -30,7 +40,11 @@ pub enum Commands {
         #[arg(long = "label", help = "Backup label/name")]
         label: Option<String>,
 
-        #[arg(long = "block-size", default_value = "4096", help = "Block size in bytes")]
+        #[arg(
+            long = "block-size",
+            default_value = "4096",
+            help = "Block size in bytes"
+        )]
         block_size: u32,
     },
 
@@ -45,7 +59,11 @@ pub enum Commands {
         #[arg(long = "label", help = "Backup label")]
         label: Option<String>,
 
-        #[arg(long = "block-size", default_value = "4096", help = "Block size in bytes")]
+        #[arg(
+            long = "block-size",
+            default_value = "4096",
+            help = "Block size in bytes"
+        )]
         block_size: u32,
     },
 
@@ -57,7 +75,11 @@ pub enum Commands {
         #[arg(help = "Target device path for restore")]
         target: String,
 
-        #[arg(short = 'p', long = "point", help = "Restore point (latest, full, or incremental ID)")]
+        #[arg(
+            short = 'p',
+            long = "point",
+            help = "Restore point (latest, full, or incremental ID)"
+        )]
         point: Option<String>,
     },
 
@@ -87,7 +109,11 @@ pub enum Commands {
         #[arg(short = 'k', long = "key", help = "Encryption key file")]
         key: Option<String>,
 
-        #[arg(long = "compression-level", default_value = "3", help = "ZSTD compression level (1-22)")]
+        #[arg(
+            long = "compression-level",
+            default_value = "3",
+            help = "ZSTD compression level (1-22)"
+        )]
         compression_level: i32,
     },
 
@@ -111,22 +137,60 @@ pub enum ConfigCommands {
 
 pub async fn dispatch(command: Commands) -> Result<()> {
     match command {
-        Commands::Full { source, dest, label, block_size } => {
-            println!("{} full backup from {} to {}", "[Starting]".green(), source, dest);
+        Commands::Full {
+            source,
+            dest,
+            label,
+            block_size,
+        } => {
+            println!(
+                "{} full backup from {} to {}",
+                "[Starting]".green(),
+                source,
+                dest
+            );
             let engine = crate::backup::engine::BackupEngine::new(block_size)?;
-            engine.run_full_backup(&source, &dest, label.as_deref()).await?;
+            engine
+                .run_full_backup(&source, &dest, label.as_deref())
+                .await?;
             println!("{} Full backup completed successfully", "[Done]".green());
         }
-        Commands::Incremental { source, dest, label, block_size } => {
-            println!("{} incremental backup from {} to {}", "[Starting]".green(), source, dest);
+        Commands::Incremental {
+            source,
+            dest,
+            label,
+            block_size,
+        } => {
+            println!(
+                "{} incremental backup from {} to {}",
+                "[Starting]".green(),
+                source,
+                dest
+            );
             let engine = crate::backup::engine::BackupEngine::new(block_size)?;
-            engine.run_incremental_backup(&source, &dest, label.as_deref()).await?;
-            println!("{} Incremental backup completed successfully", "[Done]".green());
+            engine
+                .run_incremental_backup(&source, &dest, label.as_deref())
+                .await?;
+            println!(
+                "{} Incremental backup completed successfully",
+                "[Done]".green()
+            );
         }
-        Commands::Restore { source, target, point } => {
-            println!("{} restoring from {} to {}", "[Starting]".green(), source, target);
+        Commands::Restore {
+            source,
+            target,
+            point,
+        } => {
+            println!(
+                "{} restoring from {} to {}",
+                "[Starting]".green(),
+                source,
+                target
+            );
             let engine = crate::restore::engine::RestoreEngine::new()?;
-            engine.run_restore(&source, &target, point.as_deref()).await?;
+            engine
+                .run_restore(&source, &target, point.as_deref())
+                .await?;
             println!("{} Restore completed successfully", "[Done]".green());
         }
         Commands::List { path, json } => {
@@ -137,40 +201,51 @@ pub async fn dispatch(command: Commands) -> Result<()> {
             } else {
                 println!("{} backups in {}:", backups.len(), path);
                 for b in &backups {
-                    println!("  {} - {} ({} blocks, {})",
-                        b.id, b.timestamp, b.block_count, b.backup_type);
+                    println!(
+                        "  {} - {} ({} blocks, {})",
+                        b.id, b.timestamp, b.block_count, b.backup_type
+                    );
                 }
             }
         }
         Commands::Check { path, repair } => {
             let repo = crate::repository::layout::Repository::open(&path)?;
             let result = repo.validate(repair)?;
-            println!("Repository check: {}", if result.is_ok() { "PASSED" } else { "FAILED" });
+            println!(
+                "Repository check: {}",
+                if result.is_ok() { "PASSED" } else { "FAILED" }
+            );
             for issue in result.issues() {
                 println!("  {}: {}", "[WARN]".yellow(), issue);
             }
         }
-        Commands::Init { path, key, compression_level } => {
-            crate::repository::layout::Repository::initialize(&path, key.as_deref(), compression_level)?;
+        Commands::Init {
+            path,
+            key,
+            compression_level,
+        } => {
+            crate::repository::layout::Repository::initialize(
+                &path,
+                key.as_deref(),
+                compression_level,
+            )?;
             println!("{} Repository initialized at {}", "[Created]".green(), path);
         }
-        Commands::Config { action } => {
-            match action {
-                Some(ConfigCommands::Show) => {
-                    let config = crate::config::loader::load_config(None)?;
-                    println!("{}", serde_yaml::to_string(&config)?);
-                }
-                Some(ConfigCommands::Validate { path }) => {
-                    match crate::config::validator::validate_file(&path) {
-                        Ok(()) => println!("{} Configuration is valid", "[OK]".green()),
-                        Err(e) => println!("{} Configuration invalid: {}", "[Error]".red(), e),
-                    }
-                }
-                None => {
-                    println!("Use --help for config subcommands");
+        Commands::Config { action } => match action {
+            Some(ConfigCommands::Show) => {
+                let config = crate::config::loader::load_config(None)?;
+                println!("{}", serde_yaml::to_string(&config)?);
+            }
+            Some(ConfigCommands::Validate { path }) => {
+                match crate::config::validator::validate_file(&path) {
+                    Ok(()) => println!("{} Configuration is valid", "[OK]".green()),
+                    Err(e) => println!("{} Configuration invalid: {}", "[Error]".red(), e),
                 }
             }
-        }
+            None => {
+                println!("Use --help for config subcommands");
+            }
+        },
     }
     Ok(())
 }

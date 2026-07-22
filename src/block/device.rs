@@ -22,7 +22,12 @@ impl BlockDevice {
 
         let device_size = Self::probe_device_size(&file, path)?;
 
-        log::info!("Opened block device: {} ({} bytes, block size: {})", path, device_size, block_size);
+        log::info!(
+            "Opened block device: {} ({} bytes, block size: {})",
+            path,
+            device_size,
+            block_size
+        );
 
         Ok(Self {
             file,
@@ -60,9 +65,7 @@ impl BlockDevice {
 
             const BLKGETSIZE64: libc::c_ulong = 0x8008_1272;
             let mut size: u64 = 0;
-            let ret = unsafe {
-                libc::ioctl(file.as_raw_fd(), BLKGETSIZE64, &mut size as *mut _)
-            };
+            let ret = unsafe { libc::ioctl(file.as_raw_fd(), BLKGETSIZE64, &mut size as *mut _) };
             if ret == 0 {
                 return Ok(size);
             }
@@ -80,7 +83,9 @@ impl BlockDevice {
         {
             self.file
                 .read_exact_at(&mut buffer, offset)
-                .with_context(|| format!("Failed to read block {} at offset {}", block_num, offset))?;
+                .with_context(|| {
+                    format!("Failed to read block {} at offset {}", block_num, offset)
+                })?;
         }
 
         #[cfg(not(unix))]
@@ -102,9 +107,9 @@ impl BlockDevice {
 
         #[cfg(unix)]
         {
-            self.file
-                .write_all_at(data, offset)
-                .with_context(|| format!("Failed to write block {} at offset {}", block_num, offset))?;
+            self.file.write_all_at(data, offset).with_context(|| {
+                format!("Failed to write block {} at offset {}", block_num, offset)
+            })?;
         }
 
         #[cfg(not(unix))]

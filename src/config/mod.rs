@@ -50,8 +50,12 @@ impl Default for Config {
     }
 }
 
-fn default_block_size() -> u32 { 4096 }
-fn default_compression_level() -> i32 { 3 }
+fn default_block_size() -> u32 {
+    4096
+}
+fn default_compression_level() -> i32 {
+    3
+}
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct EncryptionConfig {
@@ -68,7 +72,9 @@ pub struct EncryptionConfig {
     pub kms_provider: Option<String>,
 }
 
-fn default_cipher() -> String { "aes-256-gcm".to_string() }
+fn default_cipher() -> String {
+    "aes-256-gcm".to_string()
+}
 
 impl Default for EncryptionConfig {
     fn default() -> Self {
@@ -96,8 +102,12 @@ pub struct StorageConfig {
     pub compression: CompressionConfig,
 }
 
-fn default_repository_path() -> String { "/var/helix/backups".to_string() }
-fn default_max_parallel_io() -> usize { 4 }
+fn default_repository_path() -> String {
+    "/var/helix/backups".to_string()
+}
+fn default_max_parallel_io() -> usize {
+    4
+}
 
 impl Default for StorageConfig {
     fn default() -> Self {
@@ -156,8 +166,12 @@ pub struct BackupConfig {
     pub verify_after_backup: bool,
 }
 
-fn default_retention_days() -> u32 { 30 }
-fn default_true() -> bool { true }
+fn default_retention_days() -> u32 {
+    30
+}
+fn default_true() -> bool {
+    true
+}
 
 impl Default for BackupConfig {
     fn default() -> Self {
@@ -192,7 +206,9 @@ pub struct LoggingConfig {
     pub format: String,
 }
 
-fn default_log_level() -> String { "info".to_string() }
+fn default_log_level() -> String {
+    "info".to_string()
+}
 
 impl Default for LoggingConfig {
     fn default() -> Self {
@@ -219,8 +235,12 @@ pub struct PerformanceConfig {
     pub thread_count: usize,
 }
 
-fn default_buffer_size_mb() -> u32 { 64 }
-fn default_thread_count() -> usize { 4 }
+fn default_buffer_size_mb() -> u32 {
+    64
+}
+fn default_thread_count() -> usize {
+    4
+}
 
 impl Default for PerformanceConfig {
     fn default() -> Self {
@@ -255,7 +275,9 @@ fn default_tracking_method() -> String {
     }
 }
 
-fn default_checkpoint_interval() -> u64 { 300 }
+fn default_checkpoint_interval() -> u64 {
+    300
+}
 
 impl Default for TrackingConfig {
     fn default() -> Self {

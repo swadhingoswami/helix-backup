@@ -32,7 +32,9 @@ impl FullBackup {
             let pb = ProgressBar::new(total_blocks);
             pb.set_style(
                 ProgressStyle::default_bar()
-                    .template("[{elapsed_precise}] [{bar:40.cyan/blue}] {pos}/{len} blocks ({eta})")?
+                    .template(
+                        "[{elapsed_precise}] [{bar:40.cyan/blue}] {pos}/{len} blocks ({eta})",
+                    )?
                     .progress_chars("#>-"),
             );
             pb

@@ -16,8 +16,8 @@ pub fn validate_file(path: &str) -> Result<()> {
         anyhow::bail!("Configuration file is empty");
     }
 
-    let config: Config = serde_yaml::from_str(&content)
-        .map_err(|e| anyhow::anyhow!("YAML parse error: {}", e))?;
+    let config: Config =
+        serde_yaml::from_str(&content).map_err(|e| anyhow::anyhow!("YAML parse error: {}", e))?;
 
     validate(&config)
 }
@@ -63,9 +63,8 @@ pub fn validate(config: &Config) -> Result<()> {
 
     if config.encryption.enabled {
         if config.encryption.key_path.is_none() && config.encryption.kms_provider.is_none() {
-            errors.push(
-                "Encryption enabled but no key_path or kms_provider configured".to_string(),
-            );
+            errors
+                .push("Encryption enabled but no key_path or kms_provider configured".to_string());
         }
         if config.encryption.cipher != "aes-256-gcm" {
             errors.push(format!("Unsupported cipher: {}", config.encryption.cipher));
@@ -92,7 +91,10 @@ mod tests {
 
     #[test]
     fn test_invalid_block_size() {
-        let config = Config { block_size: 1234, ..Config::default() };
+        let config = Config {
+            block_size: 1234,
+            ..Config::default()
+        };
         assert!(validate(&config).is_err());
     }
 

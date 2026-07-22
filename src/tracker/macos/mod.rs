@@ -32,7 +32,10 @@ impl FseventsTracker {
 
     #[allow(dead_code)]
     fn start_fsevent_stream(&self) -> Result<()> {
-        let mut running = self.running.lock().map_err(|e| anyhow::anyhow!("Lock error: {}", e))?;
+        let mut running = self
+            .running
+            .lock()
+            .map_err(|e| anyhow::anyhow!("Lock error: {}", e))?;
         if *running {
             return Ok(());
         }
@@ -44,7 +47,10 @@ impl FseventsTracker {
 
 impl ChangeTracker for FseventsTracker {
     fn get_changed_blocks(&self, _since: Option<Checkpoint>) -> Result<Vec<u64>> {
-        let changed = self.changed_paths.lock().map_err(|e| anyhow::anyhow!("Lock error: {}", e))?;
+        let changed = self
+            .changed_paths
+            .lock()
+            .map_err(|e| anyhow::anyhow!("Lock error: {}", e))?;
         // In a real implementation, map file paths to block numbers via APFS APIs
         let _block_numbers: Vec<u64> = Vec::new();
         log::info!("Found {} changed paths", changed.len());

@@ -48,13 +48,17 @@ mod tests {
     #[test]
     fn test_compress_decompress_roundtrip() {
         let compressor = Compressor::new(3);
-        let data = b"Hello, Helix compression! This is test data that should compress well. ".repeat(100);
+        let data =
+            b"Hello, Helix compression! This is test data that should compress well. ".repeat(100);
 
         let compressed = compressor.compress(&data).unwrap();
         let decompressed = compressor.decompress(&compressed).unwrap();
 
         assert_eq!(data.to_vec(), decompressed);
-        assert!(compressed.len() < data.len(), "Compression should reduce size");
+        assert!(
+            compressed.len() < data.len(),
+            "Compression should reduce size"
+        );
     }
 
     #[test]
@@ -67,7 +71,9 @@ mod tests {
         let fast_compressed = fast.compress(&data).unwrap();
         let max_compressed = max.compress(&data).unwrap();
 
-        assert!(max_compressed.len() <= fast_compressed.len(),
-            "Higher compression should not increase size");
+        assert!(
+            max_compressed.len() <= fast_compressed.len(),
+            "Higher compression should not increase size"
+        );
     }
 }

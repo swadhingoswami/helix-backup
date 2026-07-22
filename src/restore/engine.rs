@@ -17,7 +17,8 @@ impl RestoreEngine {
         match point {
             Some("latest") | None => {
                 let snapshots = repo.list_backups()?;
-                let latest = snapshots.last()
+                let latest = snapshots
+                    .last()
                     .ok_or_else(|| anyhow::anyhow!("No backup snapshots found"))?;
 
                 if latest.backup_type == "full" {
@@ -30,7 +31,8 @@ impl RestoreEngine {
             }
             Some(id) => {
                 let snapshots = repo.list_backups()?;
-                let snap = snapshots.iter()
+                let snap = snapshots
+                    .iter()
                     .find(|s| s.id == id)
                     .ok_or_else(|| anyhow::anyhow!("Snapshot '{}' not found", id))?;
 

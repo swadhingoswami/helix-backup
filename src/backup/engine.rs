@@ -19,7 +19,12 @@ impl BackupEngine {
         })
     }
 
-    pub async fn run_full_backup(&self, source: &str, dest: &str, label: Option<&str>) -> Result<()> {
+    pub async fn run_full_backup(
+        &self,
+        source: &str,
+        dest: &str,
+        label: Option<&str>,
+    ) -> Result<()> {
         let repo = Repository::open_or_create(dest)?;
         let device = BlockDevice::open(source, self.block_size)?;
         let total_blocks = device.block_count()?;
@@ -27,17 +32,27 @@ impl BackupEngine {
         let backup_label = label.unwrap_or("full-backup");
         let snapshot_id = repo.create_snapshot(backup_label, "full")?;
 
-        log::info!("Starting full backup of {} ({} blocks, {} bytes/block)",
-            source, total_blocks, self.block_size);
+        log::info!(
+            "Starting full backup of {} ({} blocks, {} bytes/block)",
+            source,
+            total_blocks,
+            self.block_size
+        );
 
         let full = crate::backup::full::FullBackup::new(self.block_size);
-        full.execute(&device, &repo, &snapshot_id, total_blocks).await?;
+        full.execute(&device, &repo, &snapshot_id, total_blocks)
+            .await?;
 
         log::info!("Full backup completed: {} blocks backed up", total_blocks);
         Ok(())
     }
 
-    pub async fn run_incremental_backup(&self, source: &str, dest: &str, label: Option<&str>) -> Result<()> {
+    pub async fn run_incremental_backup(
+        &self,
+        source: &str,
+        dest: &str,
+        label: Option<&str>,
+    ) -> Result<()> {
         let repo = Repository::open(dest)?;
         let device = BlockDevice::open(source, self.block_size)?;
 
@@ -51,12 +66,19 @@ impl BackupEngine {
         let backup_label = label.unwrap_or("incremental-backup");
         let snapshot_id = repo.create_snapshot(backup_label, "incremental")?;
 
-        log::info!("Starting incremental backup: {} changed blocks", changed_blocks.len());
+        log::info!(
+            "Starting incremental backup: {} changed blocks",
+            changed_blocks.len()
+        );
 
         let inc = crate::backup::incremental::IncrementalBackup::new(self.block_size);
-        inc.execute(&device, &repo, &snapshot_id, &changed_blocks).await?;
+        inc.execute(&device, &repo, &snapshot_id, &changed_blocks)
+            .await?;
 
-        log::info!("Incremental backup completed: {} blocks", changed_blocks.len());
+        log::info!(
+            "Incremental backup completed: {} blocks",
+            changed_blocks.len()
+        );
         Ok(())
     }
 
@@ -80,7 +102,10 @@ impl BackupEngine {
             }
         };
 
-        log::info!("Tracker reported no changes, falling back to hash comparison with snapshot {}", last_full_id);
+        log::info!(
+            "Tracker reported no changes, falling back to hash comparison with snapshot {}",
+            last_full_id
+        );
 
         let manifest = repo.load_manifest(&last_full_id)?;
         if manifest.block_hashes.is_empty() {
@@ -89,26 +114,25 @@ impl BackupEngine {
         }
 
         let total_blocks = device.block_count()?;
-        let manifest_hashes: std::collections::HashMap<u64, [u8; 32]> = manifest.block_hashes
+        let manifest_hashes: std::collections::HashMap<u64, [u8; 32]> = manifest
+            .block_hashes
             .iter()
             .map(|h| (h.block_number, h.hash))
             .collect();
 
         let changed: Vec<u64> = (0..total_blocks)
             .into_par_iter()
-            .filter_map(|block_num| {
-                match device.read_block(block_num) {
-                    Ok(data) => {
-                        let hash = *blake3::hash(&data).as_bytes();
-                        let stored = manifest_hashes.get(&block_num);
-                        if stored.is_none_or(|s| *s != hash) {
-                            Some(Ok(block_num))
-                        } else {
-                            None
-                        }
+            .filter_map(|block_num| match device.read_block(block_num) {
+                Ok(data) => {
+                    let hash = *blake3::hash(&data).as_bytes();
+                    let stored = manifest_hashes.get(&block_num);
+                    if stored.is_none_or(|s| *s != hash) {
+                        Some(Ok(block_num))
+                    } else {
+                        None
                     }
-                    Err(e) => Some(Err(e)),
                 }
+                Err(e) => Some(Err(e)),
             })
             .collect::<Result<Vec<_>>>()?;
 

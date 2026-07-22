@@ -9,8 +9,7 @@ pub struct Encryptor {
 
 impl Encryptor {
     pub fn new(key: &[u8; 32]) -> Self {
-        let cipher = Aes256Gcm::new_from_slice(key)
-            .expect("Valid AES-256-GCM key");
+        let cipher = Aes256Gcm::new_from_slice(key).expect("Valid AES-256-GCM key");
         Self { cipher }
     }
 
@@ -19,7 +18,8 @@ impl Encryptor {
         rand::thread_rng().fill_bytes(&mut nonce_bytes);
         let nonce = Nonce::from_slice(&nonce_bytes);
 
-        let ciphertext = self.cipher
+        let ciphertext = self
+            .cipher
             .encrypt(nonce, data)
             .map_err(|e| anyhow::anyhow!("Encryption failed: {}", e))?;
 
@@ -38,7 +38,8 @@ impl Encryptor {
         let (nonce_bytes, ciphertext) = data.split_at(12);
         let nonce = Nonce::from_slice(nonce_bytes);
 
-        let plaintext = self.cipher
+        let plaintext = self
+            .cipher
             .decrypt(nonce, ciphertext)
             .map_err(|e| anyhow::anyhow!("Decryption failed: {}", e))?;
 

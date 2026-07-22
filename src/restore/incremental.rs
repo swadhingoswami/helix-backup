@@ -14,7 +14,10 @@ impl IncrementalRestore {
     ) -> Result<()> {
         let chain = repo.build_restore_chain(snapshot_id)?;
 
-        log::info!("Starting incremental restore with {} snapshots in chain", chain.len());
+        log::info!(
+            "Starting incremental restore with {} snapshots in chain",
+            chain.len()
+        );
 
         for snap_id in &chain {
             let blocks = repo.read_blocks_map(snap_id)?;

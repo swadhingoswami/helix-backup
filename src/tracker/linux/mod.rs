@@ -36,7 +36,9 @@ impl DmEraTracker {
     }
 
     fn query_era_blocks(&self, _device: &str) -> Result<Vec<u64>> {
-        anyhow::bail!("dm-era query not implemented. Requires kernel support and appropriate permissions.")
+        anyhow::bail!(
+            "dm-era query not implemented. Requires kernel support and appropriate permissions."
+        )
     }
 }
 
