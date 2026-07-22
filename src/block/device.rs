@@ -52,36 +52,21 @@ impl BlockDevice {
         })
     }
 
-    #[cfg(target_os = "linux")]
-    fn probe_device_size(file: &File, path: &str) -> Result<u64> {
-        use nix::sys::ioctl::libc::BLKGETSIZE64;
-        let size = unsafe {
+    fn probe_device_size(file: &File, _path: &str) -> Result<u64> {
+        #[cfg(target_os = "linux")]
+        {
+            use std::os::unix::io::AsRawFd;
+
+            const BLKGETSIZE64: libc::c_ulong = 0x8008_1272;
             let mut size: u64 = 0;
-            let ret = libc::ioctl(
-                file.as_raw_fd(),
-                libc::BLKGETSIZE64,
-                &mut size as *mut _,
-            );
+            let ret = unsafe {
+                libc::ioctl(file.as_raw_fd(), BLKGETSIZE64, &mut size as *mut _)
+            };
             if ret == 0 {
-                size
-            } else {
-                return Self::fallback_probe(file, path);
+                return Ok(size);
             }
-        };
-        Ok(size)
-    }
+        }
 
-    #[cfg(target_os = "macos")]
-    fn probe_device_size(file: &File, path: &str) -> Result<u64> {
-        Self::fallback_probe(file, path)
-    }
-
-    #[cfg(not(any(target_os = "linux", target_os = "macos")))]
-    fn probe_device_size(file: &File, path: &str) -> Result<u64> {
-        Self::fallback_probe(file, path)
-    }
-
-    fn fallback_probe(file: &File, _path: &str) -> Result<u64> {
         let metadata = file.metadata()?;
         Ok(metadata.len())
     }
